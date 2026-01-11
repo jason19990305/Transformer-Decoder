@@ -1,43 +1,47 @@
+import tiktoken
 
-class WordTokenizer:
-    def __init__(self , corpus):
+class TiktokenTokenizer:
+    def __init__(self, model_name="gpt-4o"):
+        try:
+            self.encoding = tiktoken.encoding_for_model(model_name)
+        except KeyError:
+            self.encoding = tiktoken.get_encoding("o200k_base")
         
-        # Convert the corpus into a single string
-        all_text = " ".join(corpus)
+        self.vocab_size = self.encoding.n_vocab
 
-        # Split the string by space
-        words = all_text.lower().split()
+    def encode(self, text: str) -> list[int]:
+        return self.encoding.encode(text, allowed_special="all")
 
-        # Remove duplicates and sort the words
-        self.vocab = sorted(list(set(words)))
+    def decode(self, ids: list[int]) -> str:
+        return self.encoding.decode(ids)
 
-        # Create a dictionary to map words to indices
-        self.word_to_idx = {word: idx for idx, word in enumerate(self.vocab)}
+def usage_example():
+    # 1. Automatically load the encoder for the corresponding model
+    tokenizer = TiktokenTokenizer("gpt-4o")
+    print(f"Using encoder: {tokenizer.encoding.name}")
+    print(f"Vocabulary size: {tokenizer.vocab_size}")
 
-        # Create a dictionary to map indices to words
-        self.idx_to_word = {idx: word for idx, word in enumerate(self.vocab)}
-        
-        self.vocab_size = len(self.vocab)
-    
-    def encode(self, text)->list[int]:
-        # Convert the text into a list of indices
-        return [self.word_to_idx.get(word, 0) for word in text.lower().split()] 
-    
-    def decode(self, indices)->str:
-        # Convert the list of indices into a string of text
-        return " ".join([self.idx_to_word.get(idx, "") for idx in indices])
+    # 2. Prepare test text (includes English and Emoji)
+    text = "Hello, world!🚀"
+
+    # 3. Encode (Text -> Token IDs)
+    token_ids = tokenizer.encode(text)
+    print(f"\nOriginal text: {text}")
+    print(f"Token IDs: {token_ids}")
+    print(f"Token count: {len(token_ids)}")
+
+    # 4. Decode (Token IDs -> Text)
+    decoded_text = tokenizer.decode(token_ids)
+    print(f"Decoded text: {decoded_text}")
+
+    # 5. Inspect each ID and its corresponding bytes (Visualization)
+    print("\n--- Token Segmentation Details ---")
+    for tid in token_ids:
+        token_bytes = tokenizer.encoding.decode_single_token_bytes(tid)
+        try:
+            print(f"ID: {tid:<10} | Content: {token_bytes.decode('utf-8')}")
+        except UnicodeDecodeError:
+            print(f"ID: {tid:<10} | Content: {token_bytes}")
 
 if __name__ == "__main__":
-    corpus = [
-        "red apple is sweet",
-        "blue sky is high",
-        "red fire is hot",
-        "blue sea is deep"
-    ]
-    tokenizer = WordTokenizer(corpus)
-    print("Vocabulary:", tokenizer.vocab)
-    print("Word to Index:", tokenizer.word_to_idx)
-    print("Index to Word:", tokenizer.idx_to_word)
-    print("Vocabulary Size:", tokenizer.vocab_size)
-    print("Encoded Text blue sky:", tokenizer.encode("blue sky"))
-    print("Decoded Text 4,5:", tokenizer.decode([4, 5]))
+    usage_example()

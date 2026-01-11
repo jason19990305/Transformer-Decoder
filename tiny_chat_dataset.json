@@ -1,0 +1,102 @@
+[
+    {
+        "instruction": "你好，請自我介紹一下。",
+        "input": "",
+        "output": "你好！我是一個由人工智慧訓練的語言模型。我可以協助你回答問題、寫作或是提供各種資訊。"
+    },
+    {
+        "instruction": "台灣最高的山是哪一座？",
+        "input": "",
+        "output": "台灣最高的山是玉山（Yushan），主峰海拔 3,952 公尺。"
+    },
+    {
+        "instruction": "請將下面的英文翻譯成繁體中文。",
+        "input": "Deep Learning is fascinating.",
+        "output": "深度學習令人著迷。"
+    },
+    {
+        "instruction": "1 加 1 等於多少？",
+        "input": "",
+        "output": "1 加 1 等於 2。"
+    },
+    {
+        "instruction": "寫一首關於「秋天」的短詩。",
+        "input": "",
+        "output": "金風吹落葉，\n紅葉滿山坡。\n涼意透窗入，\n秋聲伴夜歌。"
+    },
+    {
+        "instruction": "請用 Python 寫一個印出 'Hello World' 的函式。",
+        "input": "",
+        "output": "```python\ndef say_hello():\n    print('Hello World')\n```"
+    },
+    {
+        "instruction": "什麼是 Transformer 模型？",
+        "input": "",
+        "output": "Transformer 是一種基於注意力機制（Self-Attention）的深度學習模型，最初由 Google 在 2017 年提出，現已成為自然語言處理領域的主流架構。"
+    },
+    {
+        "instruction": "太陽系中最大的行星是哪顆？",
+        "input": "",
+        "output": "太陽系中最大的行星是木星（Jupiter）。"
+    },
+    {
+        "instruction": "如果我想要減肥，有什麼建議？",
+        "input": "",
+        "output": "減肥的核心原則是「熱量赤字」。建議您可以：1. 控制飲食，減少糖分攝取；2. 規律運動，如慢跑或重訓；3. 保持充足睡眠。"
+    },
+    {
+        "instruction": "解釋一下什麼是「遞迴」（Recursion）。",
+        "input": "",
+        "output": "遞迴是指一個函式在執行過程中，直接或間接地呼叫自己。通常需要設定一個「終止條件」來避免無限迴圈。"
+    },
+    {
+        "instruction": "幫我想一個請假的理由，不要太誇張。",
+        "input": "",
+        "output": "你可以說：「身體稍感不適，有頭暈和發燒的跡象，為了避免傳染給同事，想請假在家休息一天。」"
+    },
+    {
+        "instruction": "RGB 三原色是指哪三種顏色？",
+        "input": "",
+        "output": "RGB 代表紅（Red）、綠（Green）、藍（Blue）。"
+    },
+    {
+        "instruction": "推薦一道簡單的台灣小吃食譜。",
+        "input": "",
+        "output": "蛋餅：將麵粉水調成糊狀，平底鍋熱油後倒入麵糊，打一顆蛋上去，煎至金黃後捲起來切塊，淋上醬油膏即可。"
+    },
+    {
+        "instruction": "電腦的 CPU 是什麼的縮寫？",
+        "input": "",
+        "output": "CPU 是 Central Processing Unit 的縮寫，中文稱為「中央處理器」。"
+    },
+    {
+        "instruction": "水在幾度會沸騰？",
+        "input": "",
+        "output": "在標準大氣壓下，水的沸點是攝氏 100 度。"
+    },
+    {
+        "instruction": "請列出三個著名的物理學家。",
+        "input": "",
+        "output": "1. 愛因斯坦 (Albert Einstein)\n2. 牛頓 (Isaac Newton)\n3. 費曼 (Richard Feynman)"
+    },
+    {
+        "instruction": "什麼是 GitHub？",
+        "input": "",
+        "output": "GitHub 是一個透過 Git 進行版本控制的軟體原始碼代管服務平台，是目前全球最大的開發者社群。"
+    },
+    {
+        "instruction": "把這句話變更有禮貌：「我要喝水」",
+        "input": "",
+        "output": "請問可以給我一杯水嗎？謝謝。"
+    },
+    {
+        "instruction": "蘋果的英文怎麼拼？",
+        "input": "",
+        "output": "Apple。"
+    },
+    {
+        "instruction": "再見的日文怎麼說？",
+        "input": "",
+        "output": "莎喲娜拉（さようなら，Sayonara）。"
+    }
+]

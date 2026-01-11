@@ -99,8 +99,10 @@ class TransformerDecoder(nn.Module):
         self.multi_head_attention = MaskedMultiHeadAttention(embedding_size)
         
         # Norm layers
-        self.norm1 = nn.LayerNorm(embedding_size)
-        self.norm2 = nn.LayerNorm(embedding_size)
+        # Norm layers (RMSNorm)
+        # Using Pytorch built-in RMSNorm
+        self.norm1 = nn.RMSNorm(embedding_size)
+        self.norm2 = nn.RMSNorm(embedding_size)
         
         # MLP (Feed Forward)
         # Expansion factor is usually 4 in vanilla Transformer

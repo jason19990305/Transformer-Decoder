@@ -1,102 +1,96 @@
 import torch
 import torch.nn as nn
 from transformer import Model
-from tokenizer import WordTokenizer
+from tokenizer import TiktokenTokenizer
+from tiny_chat_dataset import ChatDataset
+from torch.utils.data import DataLoader
 import time
 
 if __name__ == "__main__":
-    corpus = [
-        "red apple is sweet <eos>",
-        "blue sky is high <eos>",
-        "red fire is hot <eos>",
-        "blue sea is deep <eos>"
-    ]
-    corpus_length = len(corpus)
-    # Tokenize the corpus
-    tokenizer = WordTokenizer(corpus)
-    # Get the number of vocabulary
+    # Settings
+    json_path = "tiny_chat_dataset.json"
+    batch_size = 20
+    embedding_size = 128
+    num_layers = 4
+    num_epochs = 500
+    lr = 0.0005
+    max_seq_len = 128
+    
+    # Initialize Tokenizer and Model's vocabulary size
+    tokenizer = TiktokenTokenizer("gpt-4o")
     num_vocab = tokenizer.vocab_size
-    # Set the embedding size = 16 for ploting purpose
-    embedding_size = 16
 
-    # Prepare Data
-    inputs = []
-    targets = []
-    for sentence in corpus:
-        tokens = tokenizer.encode(sentence)
-        inputs.append(tokens[:-1])
-        targets.append(tokens[1:])
-
+    # Prepare Dataset and DataLoader
+    dataset = ChatDataset(json_path, tokenizer, max_len=max_seq_len)
     # device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    device = torch.device("cpu")
     if device.type == "cuda":
         print("Device name : ", torch.cuda.get_device_name(0))
+
+    # Prepare Dataset and DataLoader
+    dataset = ChatDataset(json_path, tokenizer, max_len=max_seq_len, device=device)
+    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
     
-    # inputs shape : (batch_size, seq_len)
-    inputs = torch.tensor(inputs).to(device)
-    # targets shape : (batch_size, seq_len)
-    targets = torch.tensor(targets).to(device)
-    print("Input shape : ", inputs.shape)
-    print("Target shape : ", targets.shape)
-
-    # Hyperparameters
-    num_epochs = 1000
-    lr = 0.001
-    num_layers = 4
-
     # Model , Loss and Optimizer
     model = Model(num_vocab, embedding_size, num_layers).to(device)
-    criterion = nn.CrossEntropyLoss()
+    # Ignore the padding token in loss calculation
+    criterion = nn.CrossEntropyLoss(ignore_index=tokenizer.encoding.eot_token)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 
     start = time.time()
-    # Training
-    for epoch in range(num_epochs):       
-        optimizer.zero_grad()
-        # output : [batch_size, seq_len, num_vocab]
-        output = model(inputs)
-        # targets : [batch_size, seq_len]
-        # output Transpose : [batch_size, num_vocab, seq_len]
-        # Alignment least dimension
-        loss = criterion(output.transpose(1, 2), targets)
-        loss.backward()
-        optimizer.step()
+    # Training Loop
+    print(f"Starting training on {len(dataset)} samples (all-on-GPU enabled)...")
+    model.train()
+    for epoch in range(num_epochs):
+        epoch_loss = 0
+        for inputs, targets in dataloader:
+            # Inputs and targets are already on device
+            optimizer.zero_grad()
+            output = model(inputs)
+            
+            # Loss expects (batch, vocab, seq_len)
+            loss = criterion(output.transpose(1, 2), targets)
+            loss.backward()
+            optimizer.step()
+            
+            epoch_loss += loss.item()
 
-        if (epoch+1) % 100 == 0:
-            print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}')
+        if (epoch+1) % 50 == 0:
+            print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {epoch_loss/len(dataloader):.4f}')
+            
     end = time.time()
     print(f"Training time : {end - start:.2f} seconds")
 
-
-    # Testing
-    print("\n=== Testing ===")
-    test_sentences = ["red apple", "red fire","blue","red"]
+    # Inference / Testing
+    print("\n=== Chat Testing ===")
+    model.eval()
+    test_prompts = [
+        "Instruction: 你好，請自我介紹一下。 Output:",
+        "Instruction: 1 加 1 等於多少？ Output:",
+        "Instruction: 什麼是 Transformer 模型？ Output:"
+    ]
     
-    # Get EOS ID
-    eos_id = tokenizer.word_to_idx.get("<eos>")
+    eot_id = tokenizer.encoding.eot_token
     
-    for sentence in test_sentences:
-        print(f"Input: {sentence}")
-        # Encode
-        # current_ids : [1, seq_len]
-        current_ids = torch.tensor([tokenizer.encode(sentence)]).to(device)
+    for prompt in test_prompts:
+        print(f"Prompt: {prompt}")
+        current_ids = torch.tensor([tokenizer.encode(prompt)]).to(device)
         
-        # Predict until <eos> or max_len
-        for _ in range(20):
-            # output : [1, seq_len, num_vocab]
-            output = model(current_ids)
-            # Get the last token prediction
-            last_token_logits = output[0, -1, :]
-            predicted_id = torch.argmax(last_token_logits).item()
+        # Generation Loop
+        with torch.no_grad():
+            for _ in range(100):
+                output = model(current_ids)
+                # Get prediction for the last token only
+                last_token_logits = output[0, -1, :]
+                predicted_id = torch.argmax(last_token_logits).item()
+                
+                # Append predicted token to sequence
+                next_id = torch.tensor([[predicted_id]]).to(device)
+                current_ids = torch.cat([current_ids, next_id], dim=1)
+                
+                if predicted_id == eot_id:
+                    break
             
-            # Append to inputs
-            current_ids = torch.cat([current_ids, torch.tensor([[predicted_id]]).to(device)], dim=1)
-            
-            if predicted_id == eos_id:
-                break
-            
-        # Decode
         generated_text = tokenizer.decode(current_ids[0].tolist())
         print(f"Generated: {generated_text}")
         print("-" * 20)

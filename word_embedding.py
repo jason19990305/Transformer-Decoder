@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from tokenizer import WordTokenizer
+from tokenizer import TiktokenTokenizer
 
 class WordEmbedding(nn.Module):
     def __init__(self, num_vocab, embedding_size):
@@ -11,16 +11,10 @@ class WordEmbedding(nn.Module):
         return self.embedding(x)
         
 if __name__ == "__main__":
-    corpus = [
-        "red apple is sweet",
-        "blue sky is high",
-        "red fire is hot",
-        "blue sea is deep"
-    ]
-    tokenizer = WordTokenizer(corpus)
+    tokenizer = TiktokenTokenizer()
     num_vocab = tokenizer.vocab_size
     embedding_size = 3
     word_embedding = WordEmbedding(num_vocab, embedding_size)
     encoded_text = tokenizer.encode("red apple")
-    print(encoded_text)
-    print(word_embedding(torch.tensor(encoded_text)))
+    print(f"Encoded: {encoded_text}")
+    print(f"Embedding shape: {word_embedding(torch.tensor(encoded_text)).shape}")
