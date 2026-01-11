@@ -12,7 +12,7 @@ if __name__ == "__main__":
     batch_size = 20
     embedding_size = 128
     num_layers = 4
-    num_epochs = 500
+    num_epochs = 100
     lr = 0.0005
     max_seq_len = 128
     
@@ -34,7 +34,7 @@ if __name__ == "__main__":
     # Model , Loss and Optimizer
     model = Model(num_vocab, embedding_size, num_layers).to(device)
     # Ignore the padding token in loss calculation
-    criterion = nn.CrossEntropyLoss(ignore_index=tokenizer.encoding.eot_token)
+    criterion = nn.CrossEntropyLoss(ignore_index=-100)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 
     start = time.time()
@@ -67,7 +67,8 @@ if __name__ == "__main__":
     test_prompts = [
         "Instruction: 你好，請自我介紹一下。 Output:",
         "Instruction: 1 加 1 等於多少？ Output:",
-        "Instruction: 什麼是 Transformer 模型？ Output:"
+        "Instruction: 請將下面的英文翻譯成繁體中文。 Input: Deep Learning is fascinating. Output:",
+        "Instruction: 再見的日文怎麼說？ Output:",
     ]
     
     eot_id = tokenizer.encoding.eot_token

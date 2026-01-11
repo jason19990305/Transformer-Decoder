@@ -10,6 +10,7 @@ class ChatDataset(Dataset):
         self.tokenizer = tokenizer
         self.max_len = max_len
         self.eot_id = tokenizer.encoding.eot_token
+        self.padding_id = -100
         self.device = device
         
         # Pre-process and move all data to the target device (e.g., GPU)
@@ -30,11 +31,11 @@ class ChatDataset(Dataset):
             
             # Padding
             padding_len = self.max_len - len(tokens)
-            padded_tokens = tokens + [self.eot_id] * padding_len
+            padded_tokens_x = tokens + [self.eot_id] * padding_len
+            padded_tokens_y = tokens + [self.padding_id] * padding_len
             
-            # Create tensors and move to device
-            self.X.append(torch.tensor(padded_tokens[:-1], device=self.device))
-            self.Y.append(torch.tensor(padded_tokens[1:], device=self.device))
+            self.X.append(torch.tensor(padded_tokens_x[:-1], device=self.device))
+            self.Y.append(torch.tensor(padded_tokens_y[1:], device=self.device))
             
         # Convert list to a single tensor if possible (stacking)
         self.X = torch.stack(self.X)
