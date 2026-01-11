@@ -1,10 +1,10 @@
-# Self-Attention Example
+# Transsformer Decoder Example
 
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-orange)](https://pytorch.org/)
 
 
-HackMD Article : https://hackmd.io/@bGCXESmGSgeAArScMaBxLA/rJRwYNRX-g
+HackMD Article : https://hackmd.io/@bGCXESmGSgeAArScMaBxLA/rJvmAClSbl
 
 
 This is a **PyTorch** implementation of a **Self-Attention** mechanism and a **Simple Transformer** model. This project demonstrates the core components of the Transformer architecture, including Scaled Dot-Product Attention, Positional Encoding, and a basic text completion task using a custom tokenizer.
