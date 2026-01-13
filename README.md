@@ -48,7 +48,7 @@ python main.py
 *   **Training**: Trains the model for 2000 epochs to learn the sequence patterns.
 *   **Inference**: Generates text completions for prompts like "red apple" and "red fire", using `<eos>` token for variable length generation.
 
-<img width="270" height="215" alt="image" src="https://github.com/user-attachments/assets/1199f3ae-f772-4d49-9356-aee8843f8a08" />
+<img width="1779" height="423" alt="image" src="https://github.com/user-attachments/assets/de5e11d7-413b-4039-b8ee-0e6fd41195c3" />
 
 
 
