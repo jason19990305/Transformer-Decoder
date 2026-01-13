@@ -6,6 +6,23 @@ from tiny_chat_dataset import ChatDataset
 from torch.utils.data import DataLoader
 import time
 
+def count_parameters(model):
+    """
+    Count the total and trainable parameters of a model, and estimate its memory size.
+    Assuming Float32 (4 bytes per parameter).
+    """
+    total_params = sum(p.numel() for p in model.parameters())
+    trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    model_size_mb = (total_params * 4) / (1024 * 1024)
+    
+    print("-" * 30)
+    print(f"Model Parameter Statistics:")
+    print(f"  Total Parameters     : {total_params:,}")
+    print(f"  Trainable Parameters : {trainable_params:,}")
+    print(f"  Estimated Model Size : {model_size_mb:.2f} MB")
+    print("-" * 30)
+    return total_params, trainable_params, model_size_mb
+
 if __name__ == "__main__":
     # Settings
     json_path = "tiny_chat_dataset.json"
@@ -33,6 +50,10 @@ if __name__ == "__main__":
     
     # Model , Loss and Optimizer
     model = Model(num_vocab, embedding_size, num_layers).to(device)
+    
+    # Print parameter statistics
+    count_parameters(model)
+    
     # Ignore the padding token in loss calculation
     criterion = nn.CrossEntropyLoss(ignore_index=-100)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
@@ -68,7 +89,7 @@ if __name__ == "__main__":
         "Instruction: 你好，請自我介紹一下。 Output:",
         "Instruction: 1 加 1 等於多少？ Output:",
         "Instruction: 請將下面的英文翻譯成繁體中文。 Input: Deep Learning is fascinating. Output:",
-        "Instruction: 再見的日文怎麼說？ Output:",
+        "Instruction: 再見的日文怎麼說？ Output:"
     ]
     
     eot_id = tokenizer.encoding.eot_token
