@@ -37,8 +37,6 @@ if __name__ == "__main__":
     tokenizer = TiktokenTokenizer("gpt-4o")
     num_vocab = tokenizer.vocab_size
 
-    # Prepare Dataset and DataLoader
-    dataset = ChatDataset(json_path, tokenizer, max_len=max_seq_len)
     # device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     if device.type == "cuda":

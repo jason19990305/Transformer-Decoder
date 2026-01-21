@@ -84,11 +84,6 @@ class MaskedMultiHeadAttention(nn.Module):
         # Final linear projection
         output = self.fc_out(output)
         
-        # Debug Log
-        if seq_len == 8 and batch_size == 32: # Just print once for the main test case usually
-             print(f"Debug Info - Q shape after split: {Q.shape}")
-             print(f"Debug Info - Scores shape: {scores.shape}")
-             print(f"Debug Info - Output shape before fc_out: {output.shape}")
 
         return output
 
