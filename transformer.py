@@ -90,47 +90,48 @@ class MaskedMultiHeadAttention(nn.Module):
 class TransformerDecoder(nn.Module):
     def __init__(self, embedding_size):
         super(TransformerDecoder, self).__init__()
-        self.embedding_size = embedding_size
+
+        # 1. Masked Multi-Head Self-Attention
         self.multi_head_attention = MaskedMultiHeadAttention(embedding_size)
         
-        # Norm layers
-        # Norm layers (RMSNorm)
+        # 2. Norm layers (RMSNorm)
         # Using Pytorch built-in RMSNorm
         self.norm1 = nn.RMSNorm(embedding_size)
         self.norm2 = nn.RMSNorm(embedding_size)
+
+        # 3. Residual Dropouts
+        # These correspond to 'resid_pdrop' in GPT configs.
+        self.resid_drop1 = nn.Dropout(0.1)
+        self.resid_drop2 = nn.Dropout(0.1)
         
         # MLP (Feed Forward)
         # Expansion factor is usually 4 in vanilla Transformer
         self.mlp = nn.Sequential(
             nn.Linear(embedding_size, embedding_size * 4),
             nn.ReLU(),
-            nn.Linear(embedding_size * 4, embedding_size)
+            nn.Linear(embedding_size * 4, embedding_size),
+            nn.Dropout(0.1) # Internal dropout for the MLP
         )
         
     
     def forward(self, x):
-        # x shape is (batch_size, seq_len, embedding_size)
-        
-        # Pre-Norm Architecture: Norm -> Attention -> Add 
-        # 2. Norm
+        # === Part 1: Attention Block ===
+        # Pre-Norm: Normalize -> Attention -> Dropout -> Add Residual
         residual = x
-        x = self.norm1(x)
-        # 3. Multi-Head Attention
+        x = self.norm1(x) 
         x = self.multi_head_attention(x)
-        # 4. Shortcut connect (Add)
-        x = x + residual
+        x = self.resid_drop1(x)
+        x = x + residual  # Residual Connection
 
-        
-        # Post-Norm Architecture: Attention -> Add -> Norm -> MLP
+        # === Part 2: Feed-Forward Block (MLP) ===
+        # Pre-Norm: Normalize -> MLP -> Dropout -> Add Residual
         residual = x
-        # 5. Norm
         x = self.norm2(x)
-        # 6. MLP
         x = self.mlp(x)
-        # 7. Shortcut connect (Add)
-        output = x + residual
+        x = self.resid_drop2(x)
+        x = x + residual  # Residual Connection
 
-        return output
+        return x
 
 class Model(nn.Module):
     def __init__(self, num_vocab, embedding_size, num_layers=4):
